@@ -1,0 +1,6 @@
+"Bite location","Probability of death (95% CI)","Number of deaths","Number of bite victims that did not receive PEP","Probability of bite site (95% CI)","Number of suspect rabies exposures"
+"Head","0.385 (0.234-0.554)",15,39,"0.088 (0.075-0.1)",164
+"Trunk","0.215 (0.123-0.335)",14,65,"0.139 (0.123-0.155)",258
+"Arm","0.141 (0.086-0.213)",18,128,"0.315 (0.292-0.334)",586
+"Leg","0.127 (0.087-0.176)",30,237,"0.459 (0.436-0.48)",855
+"","0.165 (0.133-0.201)",77,469,"",1863
