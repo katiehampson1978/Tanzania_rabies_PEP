@@ -289,21 +289,28 @@ paste0("Lowest ideal average travelling distance ", round(mean(HC_distance_data$
 # Caption for figure 2 #
 ########################
 
-# Remove any remaining delays outside of range
-summary(traced_CT_data$delay.pep.1)
-hist_cap <- traced_CT_data[which(traced_CT_data$delay.pep.1>=0 & traced_CT_data$delay.pep.1<91),]
+# Remove delays outside of range
+summary(CT_data_rabid$delay.pep.1)
+hist_cap <- CT_data_rabid[which(CT_data_rabid$delay.pep.1>=0 & CT_data_rabid$delay.pep.1<91),]
+hist_cap_traced <- traced_CT_data[which(traced_CT_data$delay.pep.1>=0 & traced_CT_data$delay.pep.1<91),]
 
-paste0("Figure 2: Of ", length(which(hist_cap$late.PEP=="late")),
-       " patients with delayed PEP, ", length(which(hist_cap$late.PEP=="late" & hist_cap$Patient.outcome=="Died")),
-       " deaths occured.")
-
-########################
-# Caption for figure 3 #
-########################
-
+# Subset HC for individuals that received PEP
 HC_barplot_cap <- HC_data[which(HC_data$visit_status>0 & HC_data$is_antirabies_available=="yes"),]
+
+# Subset CT for uspect exposure individuals that sought PEP and did not die of Rabies
 CT_barplot_cap <- ser_ngor_rabid[which(ser_ngor_rabid$Sought==1 & ser_ngor_rabid$Patient.outcome!="Died"),]
 
-paste0("Dark grey indicates patients recorded in mobile phone-based surveillance data from Southern Tanzania (",
-       format(nrow(HC_barplot_cap), big.mark=","), ") and light grey indicates rabies exposed patients from Serengeti and Ngorongoro districts (",
-       format(nrow(CT_barplot_cap), big.mark=","), ")")
+paste0("Panel A shows contact tracing data on delays between exposure and initiation of PEP 
+       for rabies exposed persons ( ", length(which(hist_cap$Study.Area=="NTz")), 
+       " exposures from Serengeti and Ngorongoro districts, and ", 
+       length(which(hist_cap$Study.Area %in% c("STz", "Pemba"))), 
+       "exposures from 11 districts in southern Tanzania). Out of ", 
+       length(which(hist_cap_traced$late.PEP=="late")),
+       " patients identified through contact tracing who had delayed PEP (more than 1 day late), ",
+       length(which(hist_cap_traced$late.PEP=="late" & hist_cap_traced$Patient.outcome=="Died")),
+       " deaths occurred (Table 2). ")
+
+paste0("Panel B shows mobile phone-based surveillance records from Southern Tanzania (yellow, n = ",
+       format(nrow(HC_barplot_cap), big.mark=","),
+       ") of PEP completion and contact tracing data on rabies exposed patients from Serengeti and 
+       gorongoro districts (n = ", format(nrow(CT_barplot_cap), big.mark=","), "). ")

@@ -1,16 +1,5 @@
-#' @title Calculate proportion of bite victims that recieved multiple bites
-#' @description This function produces a dataframe, giving the proportion of
-#' individuals that recieved mutliple bites during the bite incident, the numerator
-#' and denominator for the proportion, as well as 95% confidence intervals.
-#' @param dataframe the dataframe from which the proportion is calculated
-#' @param head_col (default="Head") the column stating a bite wound to the head
-#' @param arm_col (default="Arm") the column stating a bite wound to the arm
-#' @param hand_col (default="Hand") the column stating a bite wound to the hand
-#' @param trunk_col (default="Trunk") the column stating a bite wound to the trunk
-#' @param leg_col (default="Leg") the column stating a bite wound to the leg
-#' @param foot_col (default="Foot") the column stating a bite wound to the foot
-#' @return a dataframe providing the results of the calculations
-#' @export
+# This function gives information on individuals with multiple bite wounds from 
+# the same bite incident.
 TZ_p_multiple.bites <- function(dataframe, head_col="Head", arm_col="Arm", hand_col="Hand",
                                 trunk_col="Trunk", leg_col="Leg", foot_col="Foot"){
 

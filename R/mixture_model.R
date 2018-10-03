@@ -1,6 +1,8 @@
 # Load in data
 transmission <- read.csv("output/transmission.csv", stringsAsFactors=FALSE)
 
+# This function uses information on number of bite incidents, expoosures, no-PEP,
+# deaths and location on the body of bites.
 mixture_model<-function(n){ # Cleaveland 2002 mixture model
   
   N = transmission$n_rabid.bites # N BITES
@@ -52,6 +54,7 @@ mixture_model<-function(n){ # Cleaveland 2002 mixture model
                     p_death_leg=prob_death_given_leg*prob_leg))
 }
 
+# This function calculates quantiles for confidence of bite location and deaths
 get_quantiles <- function(model_results){
   
   # Create a vector of probability of bite site for each bite location (+ CIs)
