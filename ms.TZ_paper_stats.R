@@ -13,7 +13,6 @@ library(Hmisc)
 
 # Load functions
 source("R/mixture_model.R")
-source("R/TZ_p_infect.from.bite.loc.R")
 source("R/TZ_p_multiple.bites.R")
 
 Mode <- function(x){
@@ -28,8 +27,8 @@ Mode <- function(x){
 CT_totals <- read.csv("output/CT_totals.csv", stringsAsFactors=FALSE)
 CT_data <- read.csv("output/CT_data.csv", stringsAsFactors=FALSE)
 CT_data_rabid <- read.csv("output/CT_data_rabid.csv", stringsAsFactors=FALSE)
-HC_bite_summary <- read.csv("output/HC_bite_summary.csv", stringsAsFactors=FALSE)
-NTz_bite_summary <- read.csv("output/NTz_bite_summary.csv", stringsAsFactors=FALSE)
+HC_bite_patient_summary <- read.csv("output/HC_bite_summary_patients.csv", stringsAsFactors=FALSE)
+HC_rab_exposure_summary <- read.csv("output/HC_bite_summary_exposures.csv", stringsAsFactors=FALSE)
 HC_data <- read.csv("output/HC_data.csv", stringsAsFactors=FALSE)
 HC_outside_study_area <- read.csv("output/HC_outside_study.csv", stringsAsFactors=FALSE)
 HC_distance_data <- read.csv("output/HC_dist_data.csv", stringsAsFactors=FALSE)
@@ -84,8 +83,8 @@ paste0("CT Number of people presenting to health facility: ", format(CT_totals$n
 paste0("CT Number of people bitten by a suspect rabid animal: ", format(CT_totals$n_rabid, big.mark=","))
 paste0("CT Number of people bitten by a suspect rabid animal that did not seek PEP: ", format(CT_totals$n_non_report_rabid, big.mark=","))
 
-paste0("CT years taken for Bite incidence: ", min(HC_bite_summary$year[which(HC_bite_summary$District %in% c("Serengeti", "Ngorongoro"))]),
-       "-", max(HC_bite_summary$year[which(HC_bite_summary$District %in% c("Serengeti", "Ngorongoro"))]))
+paste0("CT years taken for Bite incidence: ", min(HC_bite_patient_summary$year[which(HC_bite_patient_summary$District %in% c("Serengeti", "Ngorongoro"))]),
+       "-", max(HC_bite_patient_summary$year[which(HC_bite_patient_summary$District %in% c("Serengeti", "Ngorongoro"))]))
 
 paste0("CT Number of people bitten by a suspect rabid animal: ", format(CT_totals$n_rabid, big.mark=","))
 paste("Number of people that received RIG: ", length(which(CT_data$Immunoglobulin==TRUE)))
@@ -105,19 +104,19 @@ paste0("Sample size completion in STz: ", nrow(CT_data_rabid[which(CT_data_rabid
 
 #########################################################
 # Incidence of bite-injury patients and probable rabies exposures
-
-incidence <- HC_bite_summary %>%
+incidence_aver <- HC_bite_patient_summary %>%
   group_by(District) %>%
-  summarise(bites_per_pop_per_100000 = mean(bites_per_pop_per_100000))
-paste0("Range of Incidence of bite patients presenting to health facilities across districts in Tanzania: ",
-       round(min(HC_bite_summary$bites_per_pop_per_100000), digits=2),
-       "/100,000 to ", round(max(HC_bite_summary$bites_per_pop_per_100000), digits=2), "/100,000.")
+  summarise(mean_inc = mean(bites_per_pop_per_100000))
+
+paste0("Average range of Incidence of bite patients presenting to health facilities across districts in Tanzania: ",
+       round(min(incidence_aver$mean_inc), digits=2), "/100,000 to ",
+       round(max(incidence_aver$mean_inc), digits=2), "/100,000.")
 
 # Need to rescale (standardise) the continuous explanatory variables
-HC_model_df <- cbind(HC_bite_summary,
-                     "R_estimatedDogs"=(HC_bite_summary$est_dogs-mean(HC_bite_summary$est_dogs))/sd(HC_bite_summary$est_dogs),
-                     "R_dog_density"=(HC_bite_summary$dog_density-mean(HC_bite_summary$dog_density))/sd(HC_bite_summary$dog_density),
-                     "R_human_dog_ratio"=(HC_bite_summary$HDR-mean(HC_bite_summary$HDR))/sd(HC_bite_summary$HDR))
+HC_model_df <- cbind(HC_bite_patient_summary,
+                     "R_estimatedDogs"=(HC_bite_patient_summary$est_dogs-mean(HC_bite_patient_summary$est_dogs))/sd(HC_bite_patient_summary$est_dogs),
+                     "R_dog_density"=(HC_bite_patient_summary$dog_density-mean(HC_bite_patient_summary$dog_density))/sd(HC_bite_patient_summary$dog_density),
+                     "R_human_dog_ratio"=(HC_bite_patient_summary$HDR-mean(HC_bite_patient_summary$HDR))/sd(HC_bite_patient_summary$HDR))
 
 model_b <- lmer(bites_per_pop_per_100000 ~ R_human_dog_ratio + Setting +
                   (1|year) + (1|District), data=HC_model_df)
@@ -129,12 +128,16 @@ paste0("Summary coefficients for Setting: Estimate=", round(model_coef[3,1], dig
        "; Pr=", round(model_coef[3,5], digits=5), "; Std. error=", round(model_coef[3,2], digits=3))
 
 # Print probable rabies exposures for NTz
-paste0("Probable rabies exposures for Serengeti: ", round(mean(NTz_bite_summary$bites_per_pop_per_100000[which(NTz_bite_summary$District=="Serengeti")]), digits=1), "/100,000")
-paste0("Probable rabies exposures for Ngorongoro: ", round(mean(NTz_bite_summary$bites_per_pop_per_100000[which(NTz_bite_summary$District=="Ngorongoro")]), digits=1), "/100,000")
+paste0("Probable rabies exposures for Serengeti: ", round(mean(HC_rab_exposure_summary$bites_per_pop_per_100000[which(HC_rab_exposure_summary$District=="Serengeti")]), digits=1), "/100,000 (min=",
+       round(min(HC_rab_exposure_summary$bites_per_pop_per_100000[which(HC_rab_exposure_summary$District=="Serengeti")]), digits=1), "/100,000; max=",
+       round(max(HC_rab_exposure_summary$bites_per_pop_per_100000[which(HC_rab_exposure_summary$District=="Serengeti")]), digits=1), "/100,000)")
+paste0("Probable rabies exposures for Ngorongoro: ", round(mean(HC_rab_exposure_summary$bites_per_pop_per_100000[which(HC_rab_exposure_summary$District=="Ngorongoro")]), digits=1), "/100,000 (min=",
+       round(min(HC_rab_exposure_summary$bites_per_pop_per_100000[which(HC_rab_exposure_summary$District=="Ngorongoro")]), digits=1), "/100,000; max=",
+       round(max(HC_rab_exposure_summary$bites_per_pop_per_100000[which(HC_rab_exposure_summary$District=="Ngorongoro")]), digits=1), "/100,000)")
 
 # Print HDRs for NTZ
-paste0("HDR for Serengeti: ", round(mean(HC_bite_summary$HDR[which(HC_bite_summary$District=="Serengeti")]), digits=1))
-paste0("HDR for Ngorongoro: ", round(mean(HC_bite_summary$HDR[which(HC_bite_summary$District=="Ngorongoro")]), digits=1))
+paste0("HDR for Serengeti: ", round(mean(HC_bite_patient_summary$HDR[which(HC_bite_patient_summary$District=="Serengeti")]), digits=1))
+paste0("HDR for Ngorongoro: ", round(mean(HC_bite_patient_summary$HDR[which(HC_bite_patient_summary$District=="Ngorongoro")]), digits=1))
 
 # Percentage of CT bite victims that presented to health facility following probable exposure
 n_sought = length(which(CT_data$Sought==1))

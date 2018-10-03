@@ -12,7 +12,6 @@ library(lme4)
 
 # Load functions
 source("R/mixture_model.R")
-source("R/TZ_p_infect.from.bite.loc.R")
 source("R/TZ_p_multiple.bites.R")
 
 # Set palette for all figures
@@ -24,7 +23,7 @@ fig_palette <- c("#0072B2", "#E69F00")
 
 CT_data <- read.csv("output/CT_data.csv", stringsAsFactors=FALSE)
 CT_data_rabid <- read.csv("output/CT_data_rabid.csv", stringsAsFactors=FALSE)
-HC_bite_summary <- read.csv("output/HC_bite_summary.csv", stringsAsFactors=FALSE)
+HC_bite_summary <- read.csv("output/HC_bite_summary_patients.csv", stringsAsFactors=FALSE)
 infect_results <- read.csv("output/p_infect.csv", stringsAsFactors=FALSE)
 model_results <- read.csv("output/p_infect_model.csv", stringsAsFactors=FALSE)
 HC_data <- read.csv("output/HC_data.csv", stringsAsFactors=FALSE)
@@ -53,7 +52,7 @@ ggplot(boxplot_data, aes(x=District, y=bites_per_pop_per_100000, fill=Setting)) 
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   geom_point(shape=21, size=2, position=position_dodge(0.9)) +
   stat_summary(fun.y=mean, geom="point", size = 2, colour="black",position=position_dodge(0.9)) +
-  labs(x = "District", y="Incidence of bite patients per 100,000 & \n probable rabid bites (Serengeti & Ngorongoro Districts) per 100,000") +
+  labs(x = "District", y="Incidence of bite patients per 100,000") +
   scale_fill_manual(name="Setting", values=fig_palette) + ylim(0,165) +
   geom_segment(aes(x=1, y=160, xend=length(unique(boxplot_data$District)), yend=160), arrow = arrow(ends="both", length=unit(0.5, "cm"))) +
   annotate("text", x=3.5, y=155, label=paste0("Low HDR (", round(min(boxplot_data$HDR), digits=1), ")")) +
